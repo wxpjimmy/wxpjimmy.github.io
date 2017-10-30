@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2017/10/30/%E5%A6%82%E4%BD%95%E6%89%93%E9%80%A0%E4%BC%98%E9%9B%85%E7%9A%84Thrift%20RPC%E5%B0%81%E8%A3%85%E5%BA%93%20-%20Part2/</loc>
+    <lastmod>2017-10-30T15:38:40.428Z</lastmod>
+    <data>
+        <display>
+        <title>如何打造优雅的Thrift RPC封装库 - Part2</title>
+        <pubTime>2017-10-30T15:20:01.000Z</pubTime>
+        
+        <tag>rpc</tag>
+         
+        <tag>thrift</tag>
+         
+        <tag>zookeeper</tag>
+         
+         
+           
+             
+              <breadCrumb title="rpc" url="http://wxpjimmy.github.io/categories/rpc/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2017/10/22/%E5%A6%82%E4%BD%95%E6%89%93%E9%80%A0%E4%BC%98%E9%9B%85%E7%9A%84Thrift%20RPC%E5%B0%81%E8%A3%85%E5%BA%93%20-%20Part1/</loc>
+    <lastmod>2017-10-30T15:22:20.905Z</lastmod>
+    <data>
+        <display>
+        <title>如何打造优雅的Thrift RPC封装库 - Part 1</title>
+        <pubTime>2017-10-22T14:00:01.000Z</pubTime>
+        
+        <tag>rpc</tag>
+         
+        <tag>thrift</tag>
+         
+        <tag>zookeeper</tag>
+         
+         
+           
+             
+              <breadCrumb title="rpc" url="http://wxpjimmy.github.io/categories/rpc/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2016/08/21/Google-guice%E5%AD%A6%E4%B9%A0-1/</loc>
+    <lastmod>2017-10-16T13:58:56.000Z</lastmod>
+    <data>
+        <display>
+        <title>Google guice学习(1)</title>
+        <pubTime>2016-08-21T12:43:07.000Z</pubTime>
+        
+        <tag>guice,google</tag>
+         
+         
+           
+             
+              <breadCrumb title="java" url="http://wxpjimmy.github.io/categories/java/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2016/09/04/grpc%E5%AD%A6%E4%B9%A0-1/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>GRPC系列－(1)： GRPC的历史以及设计理念</title>
+        <pubTime>2016-09-04T09:30:48.000Z</pubTime>
+        
+        <tag>rpc</tag>
+         
+        <tag>google</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/11/01/Android%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E7%AD%BE%E5%90%8D/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>Android应用程序签名</title>
+        <pubTime>2015-11-01T08:00:48.000Z</pubTime>
+        
+        <tag>android</tag>
+         
+        <tag>签名</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/10/30/%E5%B8%B8%E7%94%A8%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>常用负载均衡算法</title>
+        <pubTime>2015-10-30T00:38:29.000Z</pubTime>
+        
+        <tag>算法</tag>
+         
+        <tag>负载均衡</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/10/25/GC%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%E6%94%B6%E9%9B%86/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>GC学习资料收集</title>
+        <pubTime>2015-10-25T15:32:02.000Z</pubTime>
+        
+        <tag>java</tag>
+         
+        <tag>jvm</tag>
+         
+        <tag>GC</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/10/25/ImageDemo/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>ImageDemo</title>
+        <pubTime>2015-10-25T14:52:57.000Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/11/26/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%B9%8Bstrace/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux常用命令之strace</title>
+        <pubTime>2015-11-26T14:45:19.000Z</pubTime>
+        
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/10/11/Markdown-%E8%AF%AD%E6%B3%95%E5%AD%A6%E4%B9%A0/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>Markdown 语法学习</title>
+        <pubTime>2015-10-11T11:16:39.000Z</pubTime>
+        
+        <tag>script</tag>
+         
+        <tag>markdown</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>http://wxpjimmy.github.io/2015/11/14/Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E4%B9%8Btop/</loc>
+    <lastmod>2017-10-15T15:59:00.000Z</lastmod>
+    <data>
+        <display>
+        <title>Linux常用命令之top</title>
+        <pubTime>2015-11-14T08:32:40.000Z</pubTime>
+        
+        <tag>linux</tag>
+         
+        <tag>top</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+</urlset>

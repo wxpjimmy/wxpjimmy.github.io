@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="rpc,thrift,zookeeper," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：  负载均衡 连接池管理 客户端代理封装V2 统一监控  负载均衡常用的负载均衡算法参见常用负载均衡算法介绍所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：  服务器异构，不同服务器处理能力不同">
+<meta name="keywords" content="rpc,thrift,zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何打造优雅的Thrift RPC封装库 - Part2">
+<meta property="og:url" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Harbor">
+<meta property="og:description" content="上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：  负载均衡 连接池管理 客户端代理封装V2 统一监控  负载均衡常用的负载均衡算法参见常用负载均衡算法介绍所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：  服务器异构，不同服务器处理能力不同">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
+<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_4.png">
+<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_7.png">
+<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_5.png">
+<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_8.png">
+<meta property="og:updated_time" content="2017-10-30T15:38:40.428Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何打造优雅的Thrift RPC封装库 - Part2">
+<meta name="twitter:description" content="上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：  负载均衡 连接池管理 客户端代理封装V2 统一监控  负载均衡常用的负载均衡算法参见常用负载均衡算法介绍所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：  服务器异构，不同服务器处理能力不同">
+<meta name="twitter:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/"/>
+
+
+
+
+
+  <title>如何打造优雅的Thrift RPC封装库 - Part2 | Jimmy's Harbor</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jimmy's Harbor</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wxpjimmy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/3627160?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jimmy's Harbor">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何打造优雅的Thrift RPC封装库 - Part2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T23:20:01+08:00">
+                2017-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/rpc/" itemprop="url" rel="index">
+                    <span itemprop="name">rpc</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：</p>
+<ul>
+<li>负载均衡</li>
+<li>连接池管理</li>
+<li>客户端代理封装V2</li>
+<li>统一监控</li>
+</ul>
+<h2 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h2><p>常用的负载均衡算法参见<a href="http://www.wxpjimmy.com/2015/10/30/%E5%B8%B8%E7%94%A8%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95/" target="_blank" rel="external">常用负载均衡算法介绍</a><br>所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：</p>
+<ul>
+<li>服务器异构，不同服务器处理能力不同</li>
+<li>某一台或多台服务异常</li>
+</ul>
+<p>代码示例结构如下：<br><img src="/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png" alt="[负载均衡代码结构]" title="[负载均衡代码结构]"></p>
+<p>我们定义负载均衡算法接口ILoadBalancer如下：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public interface ILoadBalancer &#123;</div><div class="line">    /**</div><div class="line">     * choose one server instance</div><div class="line">     * </div><div class="line">     * @param all  all available server instances</div><div class="line">     * @param blacklist  server<span class="built_in"> instance </span>can't be connected during one request</div><div class="line">     * @return</div><div class="line">     */</div><div class="line">    ServerInstance getServerInstance(<span class="class">List&lt;ServerInstance&gt; all, List&lt;ServerInstance&gt; blacklist);</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其他几个类（RoundRobinLoadBalancer/CoHashLoadBalancer/PredictiveLoadBalancer）都是具体实现，分别代表round-robin算法、一致性hash算法以及根据下游负载以及处理能力动态调整算法。</p>
+<h2 id="连接池管理"><a href="#连接池管理" class="headerlink" title="连接池管理"></a>连接池管理</h2><p>目前应用的最普遍的连接池管理工具包是apache common pool，我们就选用最新的v2版本来作为我们的连接池管理工具。<br>具体maven依赖如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-pool2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.4.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>连接池管理代码结构如下：<br><img src="/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_4.png" alt="[连接池管理代码结构]" title="[连接池管理代码结构]"><br>其中定义了两个接口IConnectionPool和IConnectionPoolFactory：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IConnectionPool</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</div><div class="line">    <span class="function">V <span class="title">borrowObject</span><span class="params">(K key)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">returnObject</span><span class="params">(K key, V value)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">discardObject</span><span class="params">(K key, V value)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IConnectionPoolFactory</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line"><span class="comment">     * get a connection pool based on provided ifaceClazz </span></div><div class="line"><span class="comment">     * </span></div><div class="line"><span class="comment">     * <span class="doctag">@param</span> ifaceClazz  (server class definition)</span></div><div class="line"><span class="comment">     * <span class="doctag">@return</span></span></div><div class="line"><span class="comment">     */</span></div><div class="line">    <span class="function">IConnectionPool&lt;K,V&gt; <span class="title">getConnectionPool</span><span class="params">(Class&lt;?&gt; ifaceClazz)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ConnectionPoolConfig类提供了连接池的参数设置，这些参数都是Commons pool中指定的，我们选取了部分重要的参数开放给用户设定：<br><img src="/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_7.png" alt="[连接池重要参数]" title="[连接池重要参数]"></p>
+<p>ConnectionKey类是common pool连接池管理中每个连接对应的key，它主要包含三个字段：<br><img src="/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_5.png" alt="[连接池管理key对象]" title="[连接池管理key对象]"></p>
+<p>ThriftConnectionKeyedPooledObjectFactory 继承自common pool的BaseKeyedPooledObjectFactory类，key是ConnectionKey，返回的value是TServiceClient，这个类主要提供具体创建连接的方法实现，具体如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public <span class="class"><span class="keyword">class</span> <span class="title">ThriftConnectionKeyedPooledObjectFactory</span> <span class="keyword">extends</span> <span class="title">BaseKeyedPooledObjectFactory&lt;ConnectionKey</span>, <span class="title">TServiceClient&gt;</span> </span>&#123;</div><div class="line"></div><div class="line">    public <span class="type">TServiceClient</span> create(<span class="type">ConnectionKey</span> key) <span class="keyword">throws</span> <span class="type">Exception</span> &#123;</div><div class="line">        <span class="comment">//create client</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="type">TSocket</span> socket = <span class="keyword">new</span> <span class="type">TSocket</span>(key.getServerInstance().getIp(), key.getServerInstance().getPort(), key.getTimeout());</div><div class="line">            <span class="type">TTransport</span> transport = <span class="keyword">new</span> <span class="type">TFramedTransport</span>(socket);</div><div class="line">            transport.open();</div><div class="line">            <span class="type">TProtocol</span> protocol = <span class="keyword">new</span> <span class="type">TBinaryProtocol</span>(transport);</div><div class="line">            <span class="type">Constructor</span>&lt;?&gt; cons = key.getiClientClass().getConstructor(<span class="type">TProtocol</span>.<span class="keyword">class</span>);</div><div class="line">            <span class="type">TServiceClient</span> res = (<span class="type">TServiceClient</span>) cons.newInstance(protocol);</div><div class="line">            <span class="keyword">return</span> res;</div><div class="line">        &#125; <span class="keyword">catch</span> (<span class="type">TTransportException</span> e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; <span class="keyword">catch</span> (<span class="type">Exception</span> e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public <span class="type">PooledObject</span>&lt;<span class="type">TServiceClient</span>&gt; wrap(<span class="type">TServiceClient</span> value) &#123;</div><div class="line">        <span class="keyword">if</span> (value == <span class="literal">null</span>)</div><div class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">DefaultPooledObject</span>&lt;<span class="type">TServiceClient</span>&gt;(value);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ThriftConnectionPool是真正的Thrift连接池实现类，它依赖commons pool的对象池GenericKeyedObjectPool来管理连接，提供创建连接、归还连接、删除连接以及关闭连接池的功能。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">public class ThriftConnectionPool implements IConnectionPool&lt;ConnectionKey, TServiceClient&gt; &#123;</div><div class="line">    private static Logger logger = LoggerFactory.getLogger(ThriftConnectionPool.class);</div><div class="line"></div><div class="line">    private GenericKeyedObjectPool&lt;ConnectionKey, TServiceClient&gt; connectionPool;</div><div class="line">    private ConnectionPoolConfig config;</div><div class="line"></div><div class="line">    public ThriftConnectionPool(ConnectionPoolConfig config) &#123;</div><div class="line">        this.connectionPool = new GenericKeyedObjectPool&lt;ConnectionKey, TServiceClient&gt;(new ThriftConnectionKeyedPooledObjectFactory());</div><div class="line"></div><div class="line">        this.config = config;</div><div class="line">        this.connectionPool.setMaxTotal(config.getMaxTotal());</div><div class="line">        this.connectionPool.setMaxTotalPerKey(config.getMaxTotalPerKey());</div><div class="line">        this.connectionPool.setMaxIdlePerKey(config.getMaxIdlePerKey());</div><div class="line">        this.connectionPool.setBlockWhenExhausted(config.isBlockWhenExhausted());</div><div class="line">        this.connectionPool.setMaxWaitMillis(config.getMaxWaitTimeInMillis());</div><div class="line">        this.connectionPool.setTestOnBorrow(config.isTestOnBorrow());</div><div class="line">        this.connectionPool.setTestOnReturn(<span class="literal">true</span>);</div><div class="line">        this.connectionPool.setTimeBetweenEvictionRunsMillis(config.getTimeBetweenEvictionRunsMillis());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public TServiceClient borrowObject(ConnectionKey key) &#123;</div><div class="line">        TServiceClient<span class="built_in"> client </span>= <span class="literal">null</span>;</div><div class="line">        try &#123;</div><div class="line">           <span class="built_in"> client </span>= this.connectionPool.borrowObject(key);</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            logger.<span class="builtin-name">error</span>(<span class="string">"borrow client with key=&#123;&#125; failed, Exception: &#123;&#125;"</span>, key, e);</div><div class="line">            return <span class="literal">null</span>;</div><div class="line">        &#125;</div><div class="line">        return client;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void returnObject(ConnectionKey key, TServiceClient client) &#123;</div><div class="line">        this.connectionPool.returnObject(key, client);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void discardObject(ConnectionKey key, TServiceClient value) &#123;</div><div class="line">        try &#123;</div><div class="line">            this.connectionPool.invalidateObject(key, value);</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">           logger.warn(<span class="string">"discard client failed! key=&#123;&#125;, Exception=&#123;&#125;"</span>, key, e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void shutdown() &#123;</div><div class="line">        this.connectionPool.close();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>DefaultConnectionPoolFactory和PerServiceConnectionPoolFactory是连接池工厂的具体实现，分别代表的是统一连接池管理和分服务不同连接池管理，后者主要是为了减少不同服务依赖之间的互相影响。</p>
+<h2 id="客户端代理封装V2"><a href="#客户端代理封装V2" class="headerlink" title="客户端代理封装V2"></a>客户端代理封装V2</h2><p>好了，前面分别介绍了负载均衡和连接池管理，那么我们是如何将这些功能串起来的呢？   </p>
+<p>我们先来回忆下第一篇中我们介绍的最简单封装，那种情况下我们是直接创建好了服务的Client对象直接返还给使用者，使用者直接使用这个Client来发起调用，逻辑很简单，也很好理解；但是当我们加入连接池的时候情况就不一样了，有了连接池，我们不仅要创建好Client，这个Client还应该是可以重用的，那么这种情况下如果我们只是简单提供给用户返还Client对象的方法就很容易出问题，你永远不要去猜测用户的使用习惯，最好的方法就是我们提供封装库来统一管理连接的创建/借用/归还/关闭。</p>
+<p>那么我们该怎么做呢？</p>
+<p>很显然，前一篇介绍的方法在这里很难再继续走下去，我们需要换个思路，如果我们来管理连接，那么就意味着用户是不需要关心具体调用使用的是哪个Client，只要我们保证在用户发起调用的时候能正确找到一个可用的连接，发起调用，调用成功后归还连接、调用失败关闭连接就好了。这里Java的代理机制就派上用场了，我们可以创建一个代理类来代理Client类，所有细节都封装在这个代理类中（具体Java代理的机制我们这里就不展开细说了，不熟悉的同学可以去baidu/google一下）。我们返还给客户端的实际上是这个代理类，因为这个代理类实现了跟Client对象完全一样的接口，对使用者来说是感受不到差别的。</p>
+<p>我们看下代码结构：<br><img src="/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_8.png" alt="[客户端代理V2代码结构]" title="[客户端代理V2代码结构]"></p>
+<p>ClientProxyConfigFactory和ClientProxyV1是第一篇中我们介绍的封装，后者这里只是改了个名字。<br>ServiceProxy还是第一篇中介绍的封装，这里没有做任何改动（后续改进会单独讲）。</p>
+<p>我们重点看一下ThriftClientConfig、ThriftClientFactory以及ThriftClientProxy三个类：</p>
+<ul>
+<li>ThriftClientConfig是客户端配置类，可以用它指定要使用的LoadBalancer、ConnectionPoolFactory、ServiceDiscovery、timeout等配置；</li>
+<li>ThriftClientProxy是一个实现了InvocationHandler的代理类，他主要负责拦截用户发起的调用，根据要调用的服务找到一个可用的连接，然后通过反射发起调用，同时负责连接生命周期的维护；</li>
+<li>ThriftClientFactory是提供给用户使用的接口。</li>
+</ul>
+<p>具体看下ThriftClientProxy类的实现：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line">class ThriftClientProxy implements InvocationHandler &#123;</div><div class="line">    private Class&lt;?&gt; ifaceClass;</div><div class="line">    private Class&lt;?&gt; iclientClass;</div><div class="line">    private ThriftClientConfig config;</div><div class="line">    private IConnectionPool&lt;ConnectionKey, TServiceClient&gt; connectionPool;</div><div class="line">    private ServiceDiscovery serviceDiscovery;</div><div class="line"></div><div class="line">    public ThriftClientProxy(Class&lt;?&gt; ifaceClass, ThriftClientConfig config) &#123;</div><div class="line">        this.ifaceClass = ifaceClass;</div><div class="line">        this.config = config;</div><div class="line">        this.iclientClass = getIClientClass(ifaceClass);</div><div class="line">        this.connectionPool = config.getConnectionPoolFactory().getConnectionPool(ifaceClass);</div><div class="line"></div><div class="line">        serviceDiscovery = config.getServiceDiscovery();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable &#123;</div><div class="line">        IConfig properties = config.getConfigProvider().getConfig(ifaceClass);</div><div class="line">        List&lt;ServerInstance&gt; invalidInstances = new ArrayList&lt;ServerInstance&gt;();</div><div class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</div><div class="line">            List&lt;ServerInstance&gt; serverInstances = serviceDiscovery.discoverService(ifaceClass);</div><div class="line">            String loadbalancer = properties.getProperty(Constants.RPC_LOADBALANCER, <span class="literal">null</span>);</div><div class="line">            ILoadBalancer loadBalancer = getLoadBalancer(loadbalancer);</div><div class="line">            ServerInstance<span class="built_in"> instance </span>= loadBalancer.getServerInstance(serverInstances, invalidInstances);</div><div class="line">            </div><div class="line">            <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</div><div class="line">               throw new RuntimeException(<span class="string">"Can't find a valid server instance!"</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            ConnectionKey connectionKey = new ConnectionKey(iclientClass, instance, config.getTimeout());</div><div class="line">            TServiceClient<span class="built_in"> client </span>= this.connectionPool.borrowObject(connectionKey);</div><div class="line">            <span class="keyword">if</span> (client == <span class="literal">null</span>) &#123;</div><div class="line">                <span class="keyword">if</span> (config.isFailFast()) &#123;</div><div class="line">                    throw new RuntimeException(<span class="string">"Can't borrow client from server: "</span> + instance);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    invalidInstances.<span class="builtin-name">add</span>(instance);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            boolean exceptionOccurred = <span class="literal">false</span>;</div><div class="line">            try &#123;</div><div class="line">                return method.invoke(client, args);</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                exceptionOccurred = <span class="literal">true</span>;</div><div class="line">                this.connectionPool.discardObject(connectionKey, client);</div><div class="line">                <span class="keyword">if</span> (config.isFailFast()) &#123;</div><div class="line">                    throw new RuntimeException(e);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    invalidInstances.<span class="builtin-name">add</span>(instance);</div><div class="line">                    continue;</div><div class="line">                &#125;</div><div class="line">            &#125; finally &#123;</div><div class="line">                <span class="keyword">if</span> (!exceptionOccurred) &#123;</div><div class="line">                    this.connectionPool.returnObject(connectionKey, client);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>所有重要的逻辑都是invoke方法中，它支持两种模式：retry-until-succeed以及fail-fast。前者是当调用失败的时候会将当前的服务节点标记为不可用，然后重新选取一个节点发起调用直到成功为止；后者是一旦有失败立即终止，更适合于latency比较敏感的服务，比如广告。</p>
+<p>我们再看下具体逻辑，首先通过serverdiscovery找到可用的所有节点，然后从中根据指定的Loadbalancer算法选取一个节点，接下来从连接池中借用/创建一个该节点对应的连接，并通过反射直接发起调用，调用成功则归还连接并返回结果；如果失败则关闭当前连接，并根据指定的模式来决定是否重试。</p>
+<p>我们可以看到，这种模式非常灵活，所有服务发现、节点选取、连接池管理的逻辑都隐藏在代理类中，用户使用的时候只需要简单的调用ThriftClientFactory获取连接代理即可，ThriftClientFactory实现如下：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThriftClientFactory</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T getClient(Class&lt;T&gt; ifaceClazz, ThriftClientConfig config) &#123;</div><div class="line">        ThriftClientProxy proxy = <span class="keyword">new</span> <span class="type">ThriftClientProxy</span>(ifaceClazz, config);</div><div class="line"></div><div class="line">        T clientProxy = (T) Proxy.<span class="keyword">new</span><span class="type">ProxyInstance</span>(ifaceClazz.getClassLoader(),</div><div class="line">                <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]&#123;ifaceClazz, TServiceClient.class&#125;, proxy);</div><div class="line">        <span class="keyword">return</span> clientProxy;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面是客户端使用的一个示例：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">V2Demo</span>(<span class="params"></span>) throws TException </span>&#123;</div><div class="line">   ThriftClientConfig clientConfig = <span class="keyword">new</span> ThriftClientConfig(<span class="literal">true</span>);</div><div class="line">   clientConfig.setConfigProvider(<span class="keyword">new</span> ZookeeperConfigProvider());</div><div class="line"></div><div class="line">   Calculator.Iface ifaceClient = ThriftClientFactory.getClient(Calculator.Iface.class, clientConfig);</div><div class="line">   <span class="keyword">if</span> (ifaceClient != <span class="literal">null</span>) &#123;</div><div class="line">       ifaceClient.ping();</div><div class="line">       <span class="keyword">int</span> result = ifaceClient.<span class="keyword">add</span>(<span class="number">100</span>, <span class="number">50</span>);</div><div class="line">       System.<span class="keyword">out</span>.println(<span class="string">"100 + 50 = "</span> + result);</div><div class="line"></div><div class="line">       ifaceClient.ping();</div><div class="line">       ifaceClient.ping();</div><div class="line">       ifaceClient.ping();</div><div class="line"></div><div class="line">       result = ifaceClient.<span class="keyword">add</span>(<span class="number">100</span>, <span class="number">80</span>);</div><div class="line">       System.<span class="keyword">out</span>.println(<span class="string">"100 + 80 = "</span> + result);</div><div class="line">   &#125; <span class="keyword">else</span> &#123;</div><div class="line">       System.<span class="keyword">out</span>.println(<span class="string">"create client failed!"</span>);</div><div class="line">   &#125;</div><div class="line">   ifaceClient.zip();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="统一监控"><a href="#统一监控" class="headerlink" title="统一监控"></a>统一监控</h2><p>其实有了前面的代理，统一监控就非常容易实现了，我们直接在代理类中添加监控就好，可以细分到service和method级别，添加qps、latency、超时等指标的监控，这里就不再具体展示了。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>本文从如何更好的进行负载均衡和连接池管理出发，引出对前一篇基本封装的改进完善，通过引入java代理机制，使得实现更优美，功能更灵活，也更容易支持客户端封装的统一监控。下一篇我们会介绍在V2基础上如何支持熔断、降级和限流，敬请期待。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/rpc/" rel="tag"># rpc</a>
+          
+            <a href="/tags/thrift/" rel="tag"># thrift</a>
+          
+            <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/22/如何打造优雅的Thrift RPC封装库 - Part1/" rel="next" title="如何打造优雅的Thrift RPC封装库 - Part 1">
+                <i class="fa fa-chevron-left"></i> 如何打造优雅的Thrift RPC封装库 - Part 1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://avatars0.githubusercontent.com/u/3627160?s=460&v=4"
+                alt="wxpjimmy" />
+            
+              <p class="site-author-name" itemprop="name">wxpjimmy</p>
+              <p class="site-description motion-element" itemprop="description">Be a better man!</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/wxpjimmy" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wxpjimmy@gmail.com" target="_blank" title="E-Mail">
+                    
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#负载均衡"><span class="nav-number">1.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接池管理"><span class="nav-number">2.</span> <span class="nav-text">连接池管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端代理封装V2"><span class="nav-number">3.</span> <span class="nav-text">客户端代理封装V2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#统一监控"><span class="nav-number">4.</span> <span class="nav-text">统一监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wxpjimmy</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

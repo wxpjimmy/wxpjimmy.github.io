@@ -83,20 +83,20 @@
 <meta name="keywords" content="rpc,thrift,zookeeper">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何打造优雅的Thrift RPC封装库 - Part2">
-<meta property="og:url" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/index.html">
+<meta property="og:url" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/index.html">
 <meta property="og:site_name" content="Jimmy&#39;s Harbor">
 <meta property="og:description" content="上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：  负载均衡 连接池管理 客户端代理封装V2 统一监控  负载均衡常用的负载均衡算法参见常用负载均衡算法介绍所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：  服务器异构，不同服务器处理能力不同">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
-<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_4.png">
-<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_7.png">
-<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_5.png">
-<meta property="og:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_8.png">
+<meta property="og:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
+<meta property="og:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_4.png">
+<meta property="og:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_7.png">
+<meta property="og:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_5.png">
+<meta property="og:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_8.png">
 <meta property="og:updated_time" content="2017-10-30T15:38:40.428Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何打造优雅的Thrift RPC封装库 - Part2">
 <meta name="twitter:description" content="上一篇我们介绍了如何一步步打造一个包含基础功能，支持服务注册、服务发现的Thrift RPC封装库，本文叙接上文，主要围绕以下几个方面来介绍：  负载均衡 连接池管理 客户端代理封装V2 统一监控  负载均衡常用的负载均衡算法参见常用负载均衡算法介绍所谓负载均衡，说白了就是根据下游多台机器的负载情况来动态调整流量分配。一个好的负载均衡算法要考虑到以下几种情况：  服务器异构，不同服务器处理能力不同">
-<meta name="twitter:image" content="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
+<meta name="twitter:image" content="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift%20RPC封装库%20-%20Part2/Snip20171030_3.png">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/"/>
+  <link rel="canonical" href="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/"/>
 
 
 
@@ -269,7 +269,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://wxpjimmy.github.io/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/">
+    <link itemprop="mainEntityOfPage" href="http://www.wxpjimmy.com/2017/10/30/如何打造优雅的Thrift RPC封装库 - Part2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wxpjimmy">
